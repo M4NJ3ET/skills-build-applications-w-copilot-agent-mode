@@ -21,19 +21,32 @@ export default function Users() {
         <div className="alert alert-warning">VITE_CODESPACE_NAME is not set — using relative API paths.</div>
       )}
       <h2>Users</h2>
-      {loading && <div>Loading...</div>}
-      {error && <div className="text-danger">{error}</div>}
+      {loading && <div className="spinner-border" role="status"><span className="visually-hidden">Loading...</span></div>}
+      {error && <div className="alert alert-danger">{error}</div>}
       {!loading && !error && (
-        <div className="list-group">
-          {items.map((u, i) => (
-            <div key={u._id || u.id || i} className="list-group-item d-flex justify-content-between align-items-start">
-              <div>
-                <div className="fw-bold">{u.name || u.username || `User ${i + 1}`}</div>
-                <div className="small text-muted">{u.email || ''}</div>
-              </div>
-              <div className="badge bg-secondary rounded-pill">{u.points ?? '-'}</div>
-            </div>
-          ))}
+        <div className="table-responsive">
+          <table className="table table-hover table-striped">
+            <thead className="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Team</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.length === 0 ? (
+                <tr><td colSpan={3} className="text-muted">No users found.</td></tr>
+              ) : (
+                items.map((user, i) => (
+                  <tr key={user._id || user.id || i}>
+                    <td className="fw-bold">{user.name || user.username || `User ${i + 1}`}</td>
+                    <td>{user.email || '-'}</td>
+                    <td>{user.team?.name || '-'}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

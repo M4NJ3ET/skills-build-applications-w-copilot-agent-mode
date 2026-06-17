@@ -15,33 +15,51 @@ export default function Leaderboard() {
     return () => { mounted = false; };
   }, []);
 
+  const getMedalEmoji = (rank: number) => {
+    if (rank === 1) return '🥇';
+    if (rank === 2) return '🥈';
+    if (rank === 3) return '🥉';
+    return '';
+  };
+
   return (
     <div>
       {!isCodespaceNameSet() && (
         <div className="alert alert-warning">VITE_CODESPACE_NAME is not set — using relative API paths.</div>
       )}
       <h2>Leaderboard</h2>
-      {loading && <div>Loading...</div>}
-      {error && <div className="text-danger">{error}</div>}
+      {loading && <div className="spinner-border" role="status"><span className="visually-hidden">Loading...</span></div>}
+      {error && <div className="alert alert-danger">{error}</div>}
       {!loading && !error && (
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((it, i) => (
-              <tr key={it._id || it.id || i}>
-                <td>{i + 1}</td>
-                <td>{it.name || it.username || JSON.stringify(it)}</td>
-                <td>{it.score ?? it.points ?? '-'}</td>
+        <div className="table-responsive">
+          <table className="table table-hover table-striped">
+            <thead className="table-light">
+              <tr>
+                <th style={{ width: '60px' }}>Rank</th>
+                <th>User</th>
+                <th style={{ width: '100px' }}>Score</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.length === 0 ? (
+                <tr><td colSpan={3} className="text-muted">No leaderboard data found.</td></tr>
+              ) : (
+                items.map((entry, i) => {
+                  const rank = i + 1;
+                  const score = entry.score ?? entry.points ?? 0;
+                  const userName = entry.user?.name || entry.team?.name || entry.userName || entry.name || entry.username;
+                  return (
+                    <tr key={entry._id || entry.id || i} className={rank <= 3 ? 'table-warning' : ''}>
+                      <td className="fw-bold">{getMedalEmoji(rank)} {rank}</td>
+                      <td>{userName || `User ${rank}`}</td>
+                      <td><span className="badge bg-success">{score}</span></td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

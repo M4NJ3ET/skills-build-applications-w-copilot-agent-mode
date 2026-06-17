@@ -21,20 +21,26 @@ export default function Teams() {
         <div className="alert alert-warning">VITE_CODESPACE_NAME is not set — using relative API paths.</div>
       )}
       <h2>Teams</h2>
-      {loading && <div>Loading...</div>}
-      {error && <div className="text-danger">{error}</div>}
+      {loading && <div className="spinner-border" role="status"><span className="visually-hidden">Loading...</span></div>}
+      {error && <div className="alert alert-danger">{error}</div>}
       {!loading && !error && (
         <div className="row">
-          {items.map((team, i) => (
-            <div key={team._id || team.id || i} className="col-md-4 mb-3">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title">{team.name || `Team ${i + 1}`}</h5>
-                  <p className="card-text small text-muted">{team.description || ''}</p>
+          {items.length === 0 ? (
+            <div className="col-12"><p className="text-muted">No teams found.</p></div>
+          ) : (
+            items.map((team, i) => (
+              <div key={team._id || team.id || i} className="col-md-4 mb-3">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">{team.name || `Team ${i + 1}`}</h5>
+                    <p className="card-text">
+                      <strong>Members:</strong> <span className="badge bg-primary">{team.members?.length || 0}</span>
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import mongoose from "mongoose";
 import usersRouter from "./routes/users";
 import teamsRouter from "./routes/teams";
@@ -15,6 +16,27 @@ export const BASE_URL = CODESPACE_NAME
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/octofit_db";
 
+// CORS configuration
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      CODESPACE_NAME ? `https://${CODESPACE_NAME}-5173.app.github.dev` : null,
+    ].filter(Boolean);
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get("/", (_req, res) => {
