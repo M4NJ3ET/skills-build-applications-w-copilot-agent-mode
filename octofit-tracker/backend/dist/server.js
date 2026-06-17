@@ -7,19 +7,18 @@ exports.BASE_URL = exports.CODESPACE_NAME = exports.PORT = void 0;
 exports.startServer = startServer;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const mongoose_1 = __importDefault(require("mongoose"));
 const users_1 = __importDefault(require("./routes/users"));
 const teams_1 = __importDefault(require("./routes/teams"));
 const activities_1 = __importDefault(require("./routes/activities"));
 const workouts_1 = __importDefault(require("./routes/workouts"));
 const leaderboard_1 = __importDefault(require("./routes/leaderboard"));
+const database_1 = require("./config/database");
 const app = (0, express_1.default)();
 exports.PORT = 8000;
 exports.CODESPACE_NAME = process.env.CODESPACE_NAME;
 exports.BASE_URL = exports.CODESPACE_NAME
     ? `https://${exports.CODESPACE_NAME}-8000.app.github.dev`
     : "http://localhost:8000";
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/octofit_db";
 // CORS configuration
 const corsOptions = {
     origin: (origin, callback) => {
@@ -51,11 +50,11 @@ app.use("/api/workouts", workouts_1.default);
 app.use("/api/leaderboard", leaderboard_1.default);
 async function startServer() {
     try {
-        await mongoose_1.default.connect(MONGO_URI);
-        console.log("Connected to MongoDB at", MONGO_URI);
+        await (0, database_1.connectDatabase)();
     }
     catch (error) {
-        console.error("MongoDB connection error:", error);
+        console.error("Failed to start server:", error);
+        process.exit(1);
     }
     app.listen(exports.PORT, () => {
         console.log(`Backend listening on ${exports.BASE_URL}`);
